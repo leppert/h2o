@@ -32,27 +32,27 @@ class CasebookSystemTest < ApplicationSystemTestCase
       visit root_path
 
       find('.create-casebook').trigger 'click'
-      click_link 'Make a New Casebook'
+      click_link I18n.t('content.dashboard.new-casebook-modal.from-scratch')
 
       fill_in 'content_casebook_title', with: 'Test casebook title'
       fill_in 'content_casebook_subtitle', with: 'Test casebook subtitle'
 
-      click_on 'Save'
+      click_on I18n.t('content.actions.save')
 
       assert_equal (find('#content_casebook_title').value), 'Test casebook title'
       assert_equal (find('#content_casebook_subtitle').value), 'Test casebook subtitle'
 
       assert_content 'This casebook has no content yet.'
-      click_button 'Add Section'
+      click_button I18n.t('content.actions.add-section')
 
       fill_in 'content_section_title', with: 'Test Section One'
-      click_link 'Save'
+      click_link I18n.t('content.actions.save')
 
       visit layout_casebook_path Content::Casebook.last
       click_link 'Test Section One'
-      assert_content 'This section has no content yet.'
+      assert_content I18n.t('content.show.empty-section')
 
-      click_link 'Add Resource'
+      click_link I18n.t('content.actions.add-resource')
 
       case_to_find = cases(:public_case_1)
       within '.case-search' do
@@ -72,9 +72,9 @@ class CasebookSystemTest < ApplicationSystemTestCase
       resource = content_nodes(:'draft_casebook_section_1.1')
 
       visit casebook_path casebook
-      click_link 'Revise'
+      click_link I18n.t('content.actions.revise')
 
-      assert_content 'This casebook is a draft'
+      assert_content I18n.t('content.edit.draft-banner.html')
       assert_content "1.1 #{resource.resource.name_abbreviation}"
 
       # stub_request(:post, "http://127.0.0.1:56369/casebooks/#{casebook.id}/reorder/#{resource.ordinals}").with(body: {"child":{"ordinals":[2,1]},"reorder":true}, headers: {"X-HTTP-Method-Override":"patch"}).to_return(body: '{"data":{"responseURL": "http://127.0.0.1:56369/casebooks/#{casebook.id}/"}')
