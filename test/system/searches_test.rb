@@ -15,8 +15,8 @@ class SearchesSystemTest < ApplicationSystemTestCase
     WebMock.disable_net_connect!(allow_localhost: true)
     
     cite = '1-ill-19'
-    query = {"cite" => cite,
-             "limit" => SearchesController::PER_PAGE}
+    query = {cite: cite,
+             limit: SearchesController::PER_PAGE}
 
     resp = File.new("#{Rails.root}/test/stubs/capapi.org-api-v1–cases.txt")
     stub_request(:get, "https://capapi.org/api/v1/cases/")

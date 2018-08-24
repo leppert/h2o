@@ -16,9 +16,9 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
   describe SearchesController, :show do
     it "should query capapi for cases when the query string is a citation" do
       cite = cases(:case_with_citation).citations[0]["cite"]
-      query = {"cite" => cite,
-               "limit" => SearchesController::PER_PAGE,
-               "offset" => 0}
+      query = {cite: cite,
+               limit: SearchesController::PER_PAGE,
+               offset: 0}
       capapi_url = "https://capapi.org/api/v1/cases/"
 
       raw_response_file = File.new("#{Rails.root}/test/stubs/capapi.org-api-v1–cases-cite-275-us-303.txt")
@@ -32,18 +32,18 @@ class SearchesControllerTest < ActionDispatch::IntegrationTest
 
     it "should not query capapi for cases when the query string is not a citation" do
       q = "not a cite"
-      query = {"cite" => q,
-               "limit" => SearchesController::PER_PAGE,
-               "offset" => 0}
+      query = {cite: q,
+               limit: SearchesController::PER_PAGE,
+               offset: 0}
       get "/search", params: {type: "cases", q: q, partial: true}
       assert_not_requested :get, "https://capapi.org/api/v1/cases/", query: query
     end
 
     it "should not query capapi for cases when searching outside of the add resources modal" do
       cite = cases(:case_with_citation).citations[0]["cite"]
-      query = {"cite" => cite,
-               "limit" => SearchesController::PER_PAGE,
-               "offset" => 0}
+      query = {cite: cite,
+               limit: SearchesController::PER_PAGE,
+               offset: 0}
       get "/search", params: {type: "cases", q: cite}
       assert_not_requested :get, "https://capapi.org/api/v1/cases/", query: query
     end
