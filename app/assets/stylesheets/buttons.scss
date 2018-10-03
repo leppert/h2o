@@ -9,7 +9,7 @@
 
 @mixin btn-white()
 {
-  @include button-variant($black, $white, transparent);
+  @include button-variant($white, transparent);
   font-weight: $bold;
 }
 

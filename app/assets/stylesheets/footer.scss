@@ -39,7 +39,7 @@ body {
     }
     .info {
       @include make-md-column(3);
-      @extend .float-right;
+      margin-left: auto;
       text-align: right;
       .copyright {
         margin-top: 15px;

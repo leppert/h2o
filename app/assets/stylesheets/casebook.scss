@@ -39,7 +39,7 @@ main > header.casebook {
 
     .tab {
       @include btn();
-      @include button-variant($black, $white, $light-gray);
+      @include button-variant($white, $light-gray);
       height: 38px;
       border: 2px solid $light-gray;
       border-bottom-width: 0;
@@ -296,7 +296,7 @@ form.edit_content_resource, form.edit_content_section, form.edit_content_caseboo
   section.resource-search {
     .tabs .tab {
       @extend .btn;
-      @include button-variant($black, $white, $white);
+      @include button-variant($white, $white);
       &.active {
         border: 1px solid black;
         border-bottom-color: transparent;

@@ -18,6 +18,11 @@ $green: #17AC10;
 
 $highlight: #f8e71c;
 
+$theme-colors: (
+  "primary": $green,
+  "secondary": $light-blue
+);
+
 // navbar
 $navbar-default-bg: transparent;
 $navbar-default-border: transparent;
@@ -35,10 +40,6 @@ $input-border: $black;
 
 // buttons
 $btn-border-radius-base: 0;
-$btn-default-color: $white;
-$btn-default-bg: $light-blue;
-$btn-primary-color: $white;
-$btn-primary-bg: $green;
 $padding-base-vertical: 12px;
 $padding-base-horizontal: 17px;
 
