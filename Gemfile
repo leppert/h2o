@@ -70,6 +70,7 @@ group :development do
 
   gem 'guard'
   gem 'guard-bundler'
+  gem 'guard-yarn'
   gem 'guard-rails'
   gem 'guard-rake'
   gem 'guard-spring'
