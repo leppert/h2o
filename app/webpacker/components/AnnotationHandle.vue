@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <span>
     <button aria-label="Edit annotation"
             v-bind:style="{right: offsetRight + 'px'}"
             @click.prevent="$refs.mainMenu.open">✎</button>
@@ -23,7 +23,7 @@
         <input name="content" type="url" placeholder="Url to link to..." v-model="content"/>
       </form>
     </ContextMenu>
-  </div>
+  </span>
 </template>
 
 <script>
@@ -75,7 +75,7 @@ export default {
   },
   mounted() {
     // Push over annotation margin handles which land on the same line
-    const top = this.$el.getBoundingClientRect().top;
+    const top = this.$el.getElementsByTagName("button")[0].getBoundingClientRect().top;
     window.handlePositions = window.handlePositions || {};
     window.handlePositions[top] = (window.handlePositions[top] || 0) + 1
     this.offsetRight = -25 - (30 * window.handlePositions[top]);

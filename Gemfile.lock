@@ -189,7 +189,7 @@ GEM
     faraday (0.15.2)
       multipart-post (>= 1.2, < 3)
     fastercsv (1.5.5)
-    ffi (1.9.23)
+    ffi (1.9.25)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -283,7 +283,7 @@ GEM
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
-    loofah (2.2.2)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     loofah-activerecord (2.0.0)
@@ -325,7 +325,7 @@ GEM
       activerecord (>= 3.0.0)
       activesupport (>= 3.0.0)
     nio4r (2.3.1)
-    nokogiri (1.8.4)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
@@ -433,7 +433,7 @@ GEM
     ruby_dep (1.5.0)
     ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     safe_yaml (1.0.4)
     sass (3.5.6)
       sass-listen (~> 4.0.0)
@@ -541,6 +541,7 @@ DEPENDENCIES
   exception_handler
   exception_notification
   fastercsv
+  ffi (>= 1.9.24)
   formtastic
   guard
   guard-bundler
@@ -562,7 +563,7 @@ DEPENDENCIES
   json (= 1.8.6)
   kaminari
   launchy
-  loofah (~> 2.2.1)
+  loofah (~> 2.2.3)
   loofah-activerecord (~> 2.0.0)
   m
   methadone
@@ -583,7 +584,7 @@ DEPENDENCIES
   rails_admin (~> 1.3.0)
   rails_admin_import
   rest-client (~> 1.8.0)
-  rubyzip
+  rubyzip (>= 1.2.2)
   scrypt
   select2-rails
   selenium-webdriver
@@ -600,4 +601,4 @@ DEPENDENCIES
   wrong!
 
 BUNDLED WITH
-   1.16.2
+   1.16.5

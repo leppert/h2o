@@ -4,7 +4,7 @@ import throttle from 'lodash.throttle';
 import Component from 'lib/ui/component';
 import delegate from 'delegate';
 import debounce from 'debounce';
-import {setFocus, editAnnotationHandle, stageChangeToAnnotation, stagePreviousContent, isEditable} from 'lib/ui/content/annotations';
+import {setFocus, stageChangeToAnnotation, stagePreviousContent, isEditable} from 'lib/ui/content/annotations';
 import {toggleElisionVisibility} from 'lib/ui/content/annotations/elide';
 
 
@@ -25,12 +25,11 @@ delegate(document, '.annotate.replacement .text', 'keypress', e => {
 }, true);
 
 delegate(document, '.annotate.replacement .text', 'input', e => {
-  stageChangeToAnnotation(e.target.parentElement.previousElementSibling, {content: e.target.innerText});
+  stageChangeToAnnotation(e.target, {content: e.target.innerText});
 });
 
 function handleReplaceButtonPressed(e){
   if (isEditable()) {
-    editAnnotationHandle(e.target.previousElementSibling);
     stagePreviousContent(e.target.innerText);
     setFocus(e.target.firstElementChild);
   }
@@ -39,7 +38,6 @@ function handleReplaceButtonPressed(e){
     let annotationId = e.target.dataset.annotationId;
     let elisions = document.querySelectorAll(`.annotate.replaced[data-annotation-id="${annotationId}"]`);
     toggleElisionVisibility(annotationId, 'replace', e.target, elisions);
-
   }
 }
 

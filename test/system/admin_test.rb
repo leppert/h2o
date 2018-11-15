@@ -40,4 +40,14 @@ class AdminSystemTest < ApplicationSystemTestCase
 
     click_button 'Save'
   end
+
+  scenario 'editing a casebook', js: true do
+    casebook = content_nodes(:public_casebook)
+    visit(rails_admin.edit_path(model_name: 'content~casebook', id: casebook.id))
+
+    fill_in 'Title', with: 'New Title'    
+    click_button 'Save'
+    assert_content 'Casebook successfully updated'
+    assert_content 'New Title'
+  end
 end

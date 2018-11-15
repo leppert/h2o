@@ -235,10 +235,11 @@ RailsAdmin.config do |config|
     edit do
       field :title
       field :subtitle
+      field :headnote
       field :public
-      field :ancestry
-      field :root_user_id
-      field :playlist_id
+      field :ancestry do
+        read_only true
+      end
     end
   end
 
@@ -256,18 +257,18 @@ RailsAdmin.config do |config|
     end
 
     edit do
+      field :verified_email
       field :verified_professor
-      field :login
+      field :professor_verification_requested
+      field :attribution
+      field :affiliation
       field :email_address
       field :set_password do
         label "New Password"
         help "Optional. Leave blank if not changing password."
       end
-
-      include_all_fields
-      exclude_fields :password, :password_confirmation, :crypted_password, :password_salt, :persistence_token, :oauth_token, :oauth_secret, :perishable_token
-      #fields :set_password, :email_address
-      #field :email_address
+      field :last_login_at
+      field :url
     end
   end
 end
