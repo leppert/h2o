@@ -1,0 +1,33 @@
+<!-- Modified from https://github.com/sferik/rails_admin/blob/master/app/views/rails_admin/main/delete.html.haml -->
+
+<% if %w(TextBlock Case Default).include?(@object.class.name) && @object.has_casebooks? %>
+  <div>Can't delete <%= @object.class.name %> because it's used in casebooks:</div>
+
+  <ul>
+    <% @object.associated_casebooks.each do |casebook| %>
+      <li><%= link_to(casebook.title, main_app.layout_casebook_path(casebook.id)) %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <h4>
+    <%= t("admin.form.are_you_sure_you_want_to_delete_the_object", model_name: @abstract_model.pretty_name.downcase) %>
+
+    <%= t("admin.form.all_of_the_following_related_items_will_be_deleted") %>
+  </h4>
+  <ul>
+    <%= render partial: "delete_notice", object: @object %>
+  </ul>
+  <%= form_for(@object, url: delete_path(model_name: @abstract_model.to_param, id: @object.id), html: {method: "delete"}) do %>
+    <input name="return_to" type="<%= :hidden %>" value="<%= (params[:return_to].presence || request.referer) %>"></input>
+    <div class="form-actions">
+      <button class="btn btn-danger" data-disable-with="<%= t("admin.form.confirmation") %>" type="submit">
+        <i class="icon-white icon-ok"></i>
+        <%= t("admin.form.confirmation") %>
+      </button>
+      <button class="btn" data-disable-with="<%= t("admin.form.cancel") %>" name="_continue" type="submit">
+        <i class="icon-remove"></i>
+        <%= t("admin.form.cancel") %>
+      </button>
+    </div>
+  <% end %>
+<% end %>

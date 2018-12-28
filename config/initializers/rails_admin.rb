@@ -1,59 +1,6 @@
 module RailsAdmin
   module Config
     module Actions
-      class AggregateItems < RailsAdmin::Config::Actions::Base
-        RailsAdmin::Config::Actions.register(self)
-
-        register_instance_option :visible? do
-          authorized?
-        end
-
-        register_instance_option :collection do
-          true
-        end
-        register_instance_option :http_methods do
-          [:get, :post]
-        end
-        register_instance_option :controller do
-          Proc.new do
-            if request.post?
-              if params[:from] == '' || params[:to] == ''
-                @error = 'You must select a starting and end date.'
-              else
-                start_filter = Date.strptime(params[:from], "%m/%d/%Y").beginning_of_day
-                end_filter = Date.strptime(params[:to], "%m/%d/%Y").end_of_day
-                @created = @abstract_model.where(created_at: start_filter..end_filter).select(:id, :created_at).group_by(&:month)
-                @deleted = DeletedItem.where(item_type: params[:model_name].capitalize, deleted_at: start_filter..end_filter).select(:id, :deleted_at).group_by(&:month)
-                @dates = (@created.keys + @deleted.keys).uniq.sort
-                @totals_created = {}
-                @totals_deleted = {}
-                created_total = 0
-                deleted_total = 0
-                @dates.each do |date|
-                  @created[date] = [] if !@created.has_key?(date)
-                  created_total += @created[date].size
-                  @totals_created[date] = created_total
-
-                  @deleted[date] = [] if !@deleted.has_key?(date)
-                  deleted_total += @deleted[date].size
-                  @totals_deleted[date] = deleted_total
-                end
-              end
-            end
-          end
-        end
-
-        register_instance_option :link_icon do
-          'icon-eye-open'
-        end
-      end
-    end
-  end
-end
-
-module RailsAdmin
-  module Config
-    module Actions
       class ShowInApp < RailsAdmin::Config::Actions::Base
         RailsAdmin::Config::Actions.register(self)
 
@@ -69,18 +16,8 @@ module RailsAdmin
           proc do
             if @object.is_a?(Page)
               redirect_to "/p/#{@object.slug}"
-            elsif @object.model_name.name.split(/::/).first == "Content" ## if it's a Casebook
-              if @object.public?
-                redirect_to "/#{@object.model_name.name.split(/::/).second.downcase.pluralize}/#{object.id}"
-              else
-                redirect_to "/#{@object.model_name.name.split(/::/).second.downcase.pluralize}/#{object.id}/edit"
-              end
-            elsif @object.is_a?(TextBlock) || @object.is_a?(Default)
-              resource = Content::Resource.find_by(resource_id: @object.id)
-
-              url_end = "edit" if ! resource.casebook.public?
-
-              redirect_to "/casebooks/#{resource.casebook_id}/resources/#{resource.ordinals.join('.')}/#{url_end}"
+            elsif @object.kind_of?(Content::Casebook)
+              redirect_to main_app.layout_casebook_path(@object.id)
             else
               redirect_to main_app.url_for(@object)
             end
@@ -95,17 +32,105 @@ module RailsAdmin
           false
         end
       end
+
+      class ManageCollaborators < RailsAdmin::Config::Actions::Base
+        RailsAdmin::Config::Actions.register(self)
+
+        register_instance_option :visible? do
+          authorized?
+        end
+
+        register_instance_option :member do
+          true
+        end
+
+        register_instance_option :http_methods do
+          [:get, :post, :delete, :patch]
+        end
+
+        register_instance_option :controller do
+          Proc.new do
+            if request.get? && params[:search].present? # searching users
+              user_ids = @object.collaborators.pluck(:user_id)
+              users = User.where("email_address LIKE ? OR attribution LIKE ? OR title LIKE ?", "%#{params[:search]}%", "%#{params[:search]}%", "%#{params[:search]}%").collect { |u| { id: u.id, display: u.display, affiliation: u.affiliation, email_address: u.email_address, verified_professor: u.verified_professor} }
+              @users = users.select {|user| user_ids.exclude? user[:id] } # only show users that aren't already collaborators
+
+              if @users.empty?
+                @search_term = params[:search]
+                @no_results = true
+              end
+
+            elsif request.get? # initial page load
+              # if no collaborators has attribution, the first one will recieve it
+              collaborators = @object.collaborators
+              if collaborators.present? && collaborators.first.has_attribution == false
+                collaborators.first.update(has_attribution: true)
+              end
+
+            elsif request.delete? # deleting a collaborator
+              collaborator_id = params[:button]
+              collaborator = Content::Collaborator.find(collaborator_id)
+
+              # if casebook is in a draft/published relationship - destroy collaborator roles for both
+              if @object.draft_mode_of_published_casebook == true
+                ancestor_collaborator = @object.copy_of.collaborators.find_by(user_id: collaborator.user_id)
+              elsif @object.draft.present?
+                ancestor_collaborator = @object.draft.collaborators.find_by(user_id: collaborator.user_id)
+              end
+
+              if collaborator.destroy == false || (ancestor_collaborator.present? && ancestor_collaborator.destroy == false)
+                flash[:error] = collaborator.errors.full_messages.to_sentence + ancestor_collaborator.errors.full_messages.to_sentence
+              end
+
+            elsif request.post? # adding a collaborator
+              user_id = params[:button].to_i
+              role = params[:role].downcase
+              has_attribution = params[:has_attribution]
+
+              new_collaborator = @object.collaborators.new(user_id: user_id, role: role, has_attribution: has_attribution)
+           
+              # if casebook is in a draft/published relationship - create collaborator roles for both
+              if @object.draft_mode_of_published_casebook == true
+                ancestor_collaborator = @object.copy_of.collaborators.new(user_id: user_id, role: role, has_attribution: has_attribution)
+              elsif @object.draft.present?
+                ancestor_collaborator = @object.draft.collaborators.new(user_id: user_id, role: role, has_attribution: has_attribution)
+              end
+
+              if new_collaborator.save == false || ( ancestor_collaborator.present? && ancestor_collaborator.save == false )
+                flash[:error] = new_collaborator.errors.full_messages.to_sentence + ancestor_collaborator.errors.full_messages.to_sentence
+              end
+
+            elsif request.patch? #updating a collaborator
+              collaborator_id = params[:button].to_i
+              has_attribution = params[:has_attribution]
+
+              collaborator = Content::Collaborator.find(collaborator_id)
+
+              # if casebook is in a draft/published relationship - update collaborator roles for both
+              if @object.draft_mode_of_published_casebook == true
+                ancestor_collaborator = @object.copy_of.collaborators.find_by(user_id: collaborator.user_id)
+              elsif @object.draft.present?
+                ancestor_collaborator = @object.draft.collaborators.find_by(user_id: collaborator.user_id)
+              end
+
+              if collaborator.update(has_attribution: has_attribution) == false || ( ancestor_collaborator.present? && ancestor_collaborator.update(has_attribution: has_attribution) == false)
+                flash[:error] = collaborator.errors.full_messages.to_sentence + ancestor_collaborator.errors.full_messages.to_sentence
+              end
+            end
+          end
+        end
+
+        register_instance_option :link_icon do
+          'icon-lock'
+        end
+      end
     end
   end
 end
 
 RailsAdmin.config do |config|
   config.parent_controller = '::ApplicationController'
-  config.navigation_static_links = {
-    'Playlist Importer' => '/playlists/import',
-    'Empty Playlists' => '/playlists/empty',
-    'Empty Playlists CSV' => '/playlists/empty.csv',
-  }
+  config.navigation_static_links = {}
   config.current_user_method do
     current_user
   end
@@ -116,7 +141,6 @@ RailsAdmin.config do |config|
     index                         # mandatory
     bulk_delete
 
-    aggregate_items
     import
     export
 
@@ -124,6 +148,7 @@ RailsAdmin.config do |config|
     new
 
     delete
+    manage_collaborators
     show_in_app
   end
 
@@ -235,7 +260,7 @@ RailsAdmin.config do |config|
     edit do
       field :title
       field :subtitle
-      field :headnote
+      field :headnote, :ck_editor
       field :public
       field :ancestry do
         read_only true

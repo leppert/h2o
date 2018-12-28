@@ -17,9 +17,10 @@ gem 'bcrypt'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'cancancan'
 gem 'capapi', git: 'https://github.com/leppert/capapi-ruby.git'
-gem 'ckeditor', git: 'https://github.com/harvard-lil/ckeditor.git', branch: 'rails-5-1', ref: '8f6ff82'
+gem 'ckeditor'
 gem 'coveralls', require: false
 gem 'daemons', '1.0.10'
+gem 'deep_cloneable'
 gem 'delayed_job_active_record'
 gem 'delayed_job'
 gem 'draper'
@@ -67,7 +68,7 @@ gem 'wkhtmltopdf-binary', require: false
 group :development do
   gem 'annotate'
   gem 'sunspot_solr'
-  # gem 'web-console'
+  gem 'web-console'
 
   gem 'guard'
   gem 'guard-bundler'

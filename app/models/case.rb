@@ -8,7 +8,7 @@ class Case < ApplicationRecord
 
   acts_as_taggable_on :tags
 
-  has_many :casebooks, inverse_of: :resource, class_name: 'Content::Casebook'
+  has_many :casebooks, inverse_of: :contents, class_name: 'Content::Casebook', foreign_key: :resource_id
   belongs_to :case_court, optional: true, inverse_of: :cases
 
   accepts_nested_attributes_for :case_court,
@@ -118,6 +118,15 @@ class Case < ApplicationRecord
       links += "<div><a href=#{resource_path(casebook, resource)}>#{casebook.title} [#{casebook.created_at.year}] - #{casebook.owner}</a></div>".html_safe
     end
     links.html_safe
+  end
+
+  def has_casebooks?
+    Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).present?
+  end
+
+  def associated_casebooks
+    casebook_ids = Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).pluck(:casebook_id)
+    Content::Casebook.where(id: casebook_ids).select(:id, :title)
   end
 
   private

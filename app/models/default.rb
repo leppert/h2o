@@ -9,7 +9,7 @@ class Default < ApplicationRecord
   validate :url_format
   has_ancestry :orphan_strategy => :adopt
 
-  has_many :casebooks, inverse_of: :resource
+  has_many :casebooks, inverse_of: :contents, class_name: 'Content::Casebook', foreign_key: :resource_id
 
   searchable(:include => [:metadatum, :tags]) do
     text :display_name
@@ -54,5 +54,14 @@ class Default < ApplicationRecord
 
   def self.content_types_options
     %w(text audio video image other_multimedia).map { |i| [i.gsub('_', ' ').camelize, i] }
+  end
+
+  def has_casebooks?
+    Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).present?
+  end
+
+  def associated_casebooks
+    casebook_ids = Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).pluck(:casebook_id)
+    Content::Casebook.where(id: casebook_ids).select(:id, :title)
   end
 end

@@ -9,10 +9,9 @@ class TextBlock < ApplicationRecord
 
   acts_as_taggable_on :tags
 
-  has_many :responses, -> { order(:created_at) }, :dependent => :destroy, :as => :resource
   belongs_to :user, optional: true
 
-  has_many :casebooks, inverse_of: :resource
+  has_many :casebooks, inverse_of: :contents, class_name: 'Content::Casebook', foreign_key: :resource_id
 
   validates_presence_of :name
 
@@ -75,5 +74,14 @@ class TextBlock < ApplicationRecord
 
   def clean_content
     self.content.gsub!(/\p{Cc}/, "")
+  end
+
+  def has_casebooks?
+    Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).present?
+  end
+
+  def associated_casebooks
+    casebook_ids = Content::Resource.where(resource_id: self.id).where.not(casebook_id: nil).pluck(:casebook_id)
+    Content::Casebook.where(id: casebook_ids).select(:id, :title)
   end
 end

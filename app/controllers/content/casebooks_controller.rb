@@ -6,7 +6,7 @@ class Content::CasebooksController < Content::NodeController
   before_action :require_user, only: [:clone]
 
   def new
-    @casebook = Content::Casebook.create(public: false, collaborators: [Content::Collaborator.new(user: current_user, role: 'owner')])
+    @casebook = Content::Casebook.create(public: false, collaborators: [Content::Collaborator.new(user: current_user, role: 'owner', has_attribution: true)])
     logger.debug @casebook.errors.inspect
     @content = @casebook
     redirect_to layout_casebook_path(@content)
@@ -24,12 +24,12 @@ class Content::CasebooksController < Content::NodeController
   end
 
   def create_draft
-    @clone = @casebook.clone(owner: @casebook.owner, draft_mode: true)
+    @clone = @casebook.clone(true)
     redirect_to layout_casebook_path(@clone)
   end
 
   def clone
-    @clone = @casebook.clone(owner: current_user)
+    @clone = @casebook.clone(false, current_user)
     redirect_to layout_casebook_path(@clone)
   end
 
@@ -88,7 +88,7 @@ class Content::CasebooksController < Content::NodeController
   end
 
   def set_editable
-    @edit_layout = !@preview && !@casebook.public && @casebook.owners.include?(current_user)
+    @edit_layout = !@preview && !@casebook.public && @casebook.collaborators.include?(current_user)
   end
 
   def page_title

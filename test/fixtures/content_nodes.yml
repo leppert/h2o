@@ -14,7 +14,7 @@ public_casebook_section_1:
 
 public_casebook_section_1_1:
   casebook: public_casebook
-  headnote: <p<This is the first resource in the casebook.</p>
+  headnote: <p>This is the first resource in the casebook.</p>
   resource: public_case_1
   resource_type: Case
   ordinals: [1,1]
@@ -48,7 +48,7 @@ draft_casebook_section_1:
   ordinals: [1]
   copy_of: public_casebook_section_1
 
-draft_casebook_section_1.1:
+draft_resource_1:
   casebook: draft_casebook
   headnote: >
     This is the first resource in the casebook.
@@ -57,7 +57,7 @@ draft_casebook_section_1.1:
   ordinals: [1,1]
   copy_of: public_casebook_section_1_1
 
-draft_casebook_section_1_2:
+draft_resource_2:
   casebook: draft_casebook
   headnote: >
     This is an annotatable resource in the casebook.
@@ -92,12 +92,12 @@ private_casebook_resource_1_1:
   resource_type: Case
   ordinals: [1,1]
 
-# empty_casebook:
-#   title: Empty Casebook
-#   public: true
-
 student_casebook:
   title: Student Casebook
+  public: true
+
+multi_collaborator_casebook:
+  title: Collaborator Casebook
   public: true
 
 ##########
@@ -154,6 +154,8 @@ draft_merge_casebook:
   # after the creation of the casebook for
   # tests for merge_draft_into_published_casebook#new_and_updated_annotations
   created_at: <%= DateTime.now - 3.days %> 
+  copy_of: published_casebook
+  draft_mode_of_published_casebook: true
   copy_of: published_casebook
 
 draft_merge_section_1:

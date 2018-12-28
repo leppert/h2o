@@ -7,7 +7,7 @@ class Content::Casebook < Content::Node
   validates_length_of :ordinals, is: 0
 
   has_many :contents, -> {order :ordinals}, class_name: 'Content::Child', inverse_of: :casebook, foreign_key: :casebook_id, dependent: :delete_all
-  has_many :collaborators, class_name: 'Content::Collaborator', dependent: :destroy, inverse_of: :content, foreign_key: :content_id
+  has_many :collaborators, -> {order role: :desc, has_attribution: :desc}, class_name: 'Content::Collaborator', dependent: :destroy, inverse_of: :content, foreign_key: :content_id
   has_many :unpublished_revisions, dependent: :destroy
 
   include Content::Concerns::HasCollaborators
@@ -31,14 +31,15 @@ class Content::Casebook < Content::Node
     end
   end
 
-  def clone(owner: '', draft_mode: false)
-    cloned_casebook = dup
-
-    if building_draft?(owner, draft_mode)
-      draft_mode_of_published_casebook = true
+  def clone(draft_mode, current_user = nil)
+    if draft_mode
+      cloned_casebook = self.deep_clone include: :collaborators
+      cloned_casebook.update(copy_of: self, public: false, parent: self, draft_mode_of_published_casebook: true )
+    else
+      cloned_casebook = self.dup
+      cloned_casebook.update(copy_of: self, collaborators:  [Content::Collaborator.new(user: current_user, role: 'owner', has_attribution: true)], public: false, parent: self )
     end
 
-    cloned_casebook.update(copy_of: self, collaborators:  [Content::Collaborator.new(user: owner, role: 'owner')], public: false, parent: self, draft_mode_of_published_casebook: draft_mode_of_published_casebook )
     cloned_casebook
   end
 
@@ -95,5 +96,13 @@ class Content::Casebook < Content::Node
       end
     end
     false
+  end
+
+  def alert_changes?(current_user)
+    if current_user.present?
+      draft.present? && (has_collaborator?(current_user.id) ||current_user.superadmin?)
+    else
+      false
+    end
   end
 end

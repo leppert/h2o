@@ -6,16 +6,6 @@ GIT
     will_paginate (3.1.5)
 
 GIT
-  remote: https://github.com/harvard-lil/ckeditor.git
-  revision: 8f6ff8256d9fd0a699196224a9aee5ce72e9b732
-  ref: 8f6ff82
-  branch: rails-5-1
-  specs:
-    ckeditor (4.2.2)
-      cocaine
-      orm_adapter (~> 0.5.0)
-
-GIT
   remote: https://github.com/leppert/capapi-ruby.git
   revision: 8acf041b1d3358b43ca5bebf4007ae1137ca08d8
   specs:
@@ -118,6 +108,7 @@ GEM
       request_store (~> 1.0)
       scrypt (>= 1.2, < 4.0)
     bcrypt (3.1.11)
+    bindex (0.5.0)
     bootsnap (1.3.2)
       msgpack (~> 1.0)
     builder (3.2.3)
@@ -132,6 +123,9 @@ GEM
       xpath (~> 3.0)
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
+    ckeditor (4.2.4)
+      cocaine
+      orm_adapter (~> 0.5.0)
     climate_control (0.2.0)
     cliver (0.3.2)
     cocaine (0.5.8)
@@ -155,6 +149,8 @@ GEM
       safe_yaml (~> 1.0.0)
     crass (1.0.4)
     daemons (1.0.10)
+    deep_cloneable (2.3.2)
+      activerecord (>= 3.1.0, < 6)
     delayed_job (4.1.5)
       activesupport (>= 3.0, < 5.3)
     delayed_job_active_record (4.1.3)
@@ -356,7 +352,7 @@ GEM
       pry (~> 0.10)
     public_suffix (3.0.2)
     puma (3.12.0)
-    rack (2.0.5)
+    rack (2.0.6)
     rack-pjax (1.0.0)
       nokogiri (~> 1.5)
       rack (>= 1.1)
@@ -499,6 +495,11 @@ GEM
     unf_ext (0.0.7.5)
     warden (1.2.7)
       rack (>= 1.0)
+    web-console (3.7.0)
+      actionview (>= 5.0)
+      activemodel (>= 5.0)
+      bindex (>= 0.4.0)
+      railties (>= 5.0)
     webmock (3.4.2)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -528,9 +529,10 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   cancancan
   capapi!
-  ckeditor!
+  ckeditor
   coveralls
   daemons (= 1.0.10)
+  deep_cloneable
   delayed_job
   delayed_job_active_record
   dotenv-rails
@@ -594,6 +596,7 @@ DEPENDENCIES
   sunspot_solr
   terminal-notifier-guard
   warden
+  web-console
   webmock
   webpacker
   will_paginate!

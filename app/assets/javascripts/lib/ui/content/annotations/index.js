@@ -29,9 +29,11 @@ window.addEventListener('load', () => {
   }
 });
 
-$('.view-resources-annotate').ready(e => {
-  annotator = new Annotator();
-  makeReplacementsContenteditable();
+$(document).ready(e => {
+  if($('.view-resources-annotate').length){
+    annotator = new Annotator();
+    makeReplacementsContenteditable();
+  }
 });
 
 delegate(document, '.annotate.replacement', 'focus', e => {
@@ -66,7 +68,7 @@ export function isEditable () {
 
 function makeReplacementsContenteditable() {
   let replacements = document.querySelectorAll('.resource-wrapper .annotate.replacement .text');
-  for (let el of replacements) { el.contentEditable = true; }
+  for (let el of replacements) { el.contentEditable = true; el.id = 'replacement-text'}
 }
 
 document.addEventListener('selectionchange', e => {
@@ -92,8 +94,9 @@ document.addEventListener('selectionchange', e => {
       annotator.deactivate();
     }
   } else {
-    let range = selection.getRangeAt(0);
-    annotator.select(range);
+    let ranges = {first: selection.getRangeAt(0),
+                  last: selection.getRangeAt(selection.rangeCount-1)};
+    annotator.select(ranges);
   }
 });
 

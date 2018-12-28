@@ -4,9 +4,9 @@ import AxiosConfig from 'axios';
 import {html, raw} from 'es6-string-html-template';
 import {post, patch} from 'lib/requests';
 import throttle from 'lodash.throttle';
-import Component from 'lib/ui/component'
+import Component from 'lib/ui/component';
 
-import {offsetsForRange, closestP, getCaretCharacterOffsetWithin, offsetInParagraph} from 'lib/ui/content/annotations/placement';
+import {offsetsForRanges, closestP, getCaretCharacterOffsetWithin, offsetInParagraph} from 'lib/ui/content/annotations/placement';
 
 const csrf_el = document.querySelector('meta[name=csrf-token]'),
       headers = csrf_el ? {'X-CSRF-Token': csrf_el.getAttribute('content')} : {};
@@ -78,7 +78,7 @@ export class Annotator extends Component {
     this.mode = 'inactive';
     this.handle = null;
     this.annotationId = null;
-    this.range = null;
+    this.ranges = null;
     this.updateScroll.cancel();
     this.render();
   }
@@ -119,12 +119,12 @@ export class Annotator extends Component {
     case 'link':
       return html`
         <form class="create-form" data-annotation-type="link">
-          <input name="content" type="url" placeholder="Paste URL"  />
+          <input name="content" id="link-form" placeholder="Paste URL"  />
         </form>`;
     case 'note':
       return html`
         <form class="create-form" data-annotation-type="note">
-          <textarea name="content" placeholder="Note text..."></textarea>
+          <textarea name="content" id="note-textarea" placeholder="Note text..."></textarea>
           <input class="save-note" type="submit" value="Save" />
         </form>`;
     }
@@ -165,8 +165,14 @@ export class Annotator extends Component {
     let wrapperRect = document.querySelector('.resource-wrapper').getBoundingClientRect();
     let viewportTop = window.scrollY - (wrapperRect.top + window.scrollY);
 
-    let target = this.handle || this.range;
-    this.targetRect = target ? target.getBoundingClientRect() : this.targetRect || {top: 0, bottom: 0};
+    if(this.handle){
+      this.targetRect = this.handle.getBoundingClientRect() || this.targetRect;
+    } else if (this.ranges) {
+      this.targetRect = {top: this.ranges.first.getBoundingClientRect().top,
+                         bottom: this.ranges.last.getBoundingClientRect().bottom}
+    } else {
+      this.targetRect = {top: 0, bottom: 0};
+    }
 
     return Math.min(Math.max(this.targetRect.top - wrapperRect.top,
       viewportTop + 20),
@@ -182,13 +188,13 @@ export class Annotator extends Component {
     this.render();
   } 
 
-  select (range) {
+  select (ranges) {
     this.mode = 'create-menu';
     this.annotationId = null;
     this.handle = null;
-    this.offsets = offsetsForRange(range);
+    this.offsets = offsetsForRanges(ranges);
     if (!this.offsets) { return this.deactivate(); }
-    this.range = range;
+    this.ranges = ranges;
     this.render();
   }
 }

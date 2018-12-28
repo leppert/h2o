@@ -26,6 +26,8 @@ public_case_to_annotate:
     highlighted: content to highlight;
     elided: content to elide;
     replaced: content to replace;
+    linked: content to link;
+    noted: content to note;
     commented: content to comment;
     highlighted2: second highlight content;
   public: true
@@ -80,4 +82,13 @@ case_with_capapi_id:
   opinions: {"majority": "Judge Person"}
   case_court: district_jurisdiction
   content: This is the body of case with citation.
+  public: true
+
+unused_case:
+  name_abbreviation: Unused case
+  name: Case of the District Number 1
+  decision_date: 1999-01-10
+  opinions: {"majority": "Judge Person"}
+  case_court: district_jurisdiction
+  content: This is the body of case 1.
   public: true
