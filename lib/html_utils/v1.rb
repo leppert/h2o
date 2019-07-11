@@ -3,6 +3,7 @@
 module HTMLUtils
   class V1
     EFFECTIVE_DATE = Date.new(1970)
+
     class << self
       def strip_comments! html
         html.xpath('//comment()').remove
@@ -11,7 +12,7 @@ module HTMLUtils
 
       def unwrap! html
         html
-          .xpath('//div')
+          .xpath('//article | //section | //aside')
           .each { |el| el.replace el.children }
         html
       end
@@ -23,9 +24,45 @@ module HTMLUtils
         html
       end
 
+      BLOCK_LEVEL_ELEMENTS = [
+        "ADDRESS",
+        "ARTICLE",
+        "ASIDE",
+        "BLOCKQUOTE",
+        "DETAILS",
+        "DIALOG",
+        "DD",
+        "DIV",
+        "DL",
+        "DT",
+        "FIELDSET",
+        "FIGCAPTION",
+        "FIGURE",
+        "FOOTER",
+        "FORM",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "HEADER",
+        "HGROUP",
+        "HR",
+        "LI",
+        "MAIN",
+        "NAV",
+        "OL",
+        "P",
+        "PRE",
+        "SECTION",
+        "TABLE",
+        "UL"
+      ]
+
       def wrap_bare_inline_tags! html
         html
-          .xpath("//body/*[not(self::p|self::center|self::blockquote|self::article)]")
+          .xpath("//body/*[not(self::center|self::#{BLOCK_LEVEL_ELEMENTS.map(&:downcase).join('|self::')})]")
           .each { |el| el.wrap "<p>" }
         html
       end
@@ -57,7 +94,7 @@ module HTMLUtils
       end
 
       def parse html
-        Nokogiri::HTML(html) { |config| config.strict.noblanks }
+        Nokogiri.HTML5(html)
       end
 
       def to_html nodes
